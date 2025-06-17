@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}{{ title }}{% endblock %}
+{% block content %}
+    <h1>{{ title }}</h1>
+    <form method="POST" action="{{ url_for('assignments.create_assignment') }}">
+        {{ form.csrf_token }}
+        <div>
+            {{ form.asset.label }}<br>
+            {{ form.asset() }}
+            {% for error in form.asset.errors %}
+                <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}
+        </div>
+        <div>
+            {{ form.user.label }}<br>
+            {{ form.user() }}
+            {% for error in form.user.errors %}
+                <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}
+        </div>
+        <div>
+            {{ form.submit() }}
+        </div>
+    </form>
+    {# Updated Cancel link to go to the Assignments list #}
+    <p><a href="{{ url_for('assignments.list_assignments') }}">Cancel</a></p>
+{% endblock %}

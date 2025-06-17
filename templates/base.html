@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{% block title %}{% endblock %} - My Web App</title>
+    {# Link to the static CSS file #}
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <header>
+        <nav>
+            <a href="{{ url_for('index') }}">Home</a> {# index is still in app.py #}
+            {% if current_user.is_authenticated %}
+                <a href="{{ url_for('assets.list_assets') }}">Assets</a> {# Updated #}
+                {# Link to Assignments list for ALL logged-in users #}
+                <a href="{{ url_for('assignments.list_assignments') }}">Assignments</a> {# Updated #}
+                {# Admin-only links #}
+                {% if current_user.is_admin %}
+                    <a href="{{ url_for('asset_types.list_asset_types') }}">Asset Types</a> {# Updated #}
+                    <a href="{{ url_for('users.list_users') }}">Users</a> {# Updated #}
+                {% endif %}
+                <a href="{{ url_for('auth.logout') }}">Logout</a> {# Updated #}
+            {% else %}
+                <a href="{{ url_for('auth.register') }}">Register</a> {# Updated #}
+                <a href="{{ url_for('auth.login') }}">Login</a> {# Updated #}
+            {% endif %}
+        </nav>
+    </header>
+    <main>
+        {# Display Flash Messages #}
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <ul class="flashes">
+                {% for category, message in messages %}
+                    <li class="{{ category }}">{{ message }}</li>
+                {% endfor %}
+                </ul>
+            {% endif %}
+        {% endwith %}
+
+        {# Content block for specific pages #}
+        {% block content %}{% endblock %}
+    </main>
+</body>
+</html>

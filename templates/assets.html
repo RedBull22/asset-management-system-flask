@@ -1,0 +1,93 @@
+{# templates/assets.html #}
+{% extends "base.html" %}
+{# Import the macros file #}
+{% from "macros.html" import pagination_controls %}
+
+{% block title %}Assets{% endblock %}
+{% block content %}
+    <h1>Assets</h1>
+
+    {# Allow Admin AND Regular users to create assets #}
+    {% if current_user.is_admin or current_user.role == 'regular' %}
+        <p><a href="{{ url_for('assets.create_asset') }}">Add New Asset</a></p>
+    {% endif %}
+
+    <table>
+        <thead>
+            <tr>
+                {# Make headers sortable links #}
+                <th>
+                    {# If currently sorting by name, toggle direction. Otherwise, default to asc. #}
+                    {% set next_direction = 'desc' if sort_by == 'name' and sort_direction == 'asc' else 'asc' %}
+                    {# Link includes current page, sort_by, and next_direction #}
+                    <a href="{{ url_for('assets.list_assets', page=pagination.page, sort_by='name', sort_direction=next_direction) }}">
+                        Name
+                        {# Add indicator if currently sorted by this column #}
+                        {% if sort_by == 'name' %}
+                            {% if sort_direction == 'asc' %} ▲ {% else %} ▼ {% endif %}
+                        {% endif %}
+                    </a>
+                </th>
+                <th>
+                     {% set next_direction = 'desc' if sort_by == 'serial_number' and sort_direction == 'asc' else 'asc' %}
+                     {# Link includes current page, sort_by, and next_direction #}
+                    <a href="{{ url_for('assets.list_assets', page=pagination.page, sort_by='serial_number', sort_direction=next_direction) }}">
+                        Serial Number
+                        {% if sort_by == 'serial_number' %}
+                            {% if sort_direction == 'asc' %} ▲ {% else %} ▼ {% endif %}
+                        {% endif %}
+                    </a>
+                </th>
+                 <th>
+                     {% set next_direction = 'desc' if sort_by == 'asset_type_id' and sort_direction == 'asc' else 'asc' %}
+                     {# Link includes current page, sort_by, and next_direction #}
+                    <a href="{{ url_for('assets.list_assets', page=pagination.page, sort_by='asset_type_id', sort_direction=next_direction) }}">
+                        Asset Type
+                        {% if sort_by == 'asset_type_id' %}
+                            {% if sort_direction == 'asc' %} ▲ {% else %} ▼ {% endif %}
+                        {% endif %}
+                    </a>
+                </th>
+                <th>Actions</th> {# Column for Update/Delete links #}
+            </tr>
+        </thead>
+        <tbody>
+            {# Loop over the items for the current page from the pagination object #}
+            {% for asset in pagination.items %}
+                <tr>
+                    <td>
+                        {# Link to the detail view #}
+                        <a href="{{ url_for('assets.view_asset', asset_id=asset.id) }}">
+                           {{ asset.name }}
+                        </a>
+                    </td>
+                    <td>{{ asset.serial_number }}</td>
+                    <td>{{ asset.asset_type.name }}</td>
+                    <td>
+                        {# Update link/form remains visible for Admin AND Regular users #}
+                        {% if current_user.is_authenticated %}
+                            {% if current_user.is_admin or current_user.role == 'regular' %}
+                                 <a href="{{ url_for('assets.update_asset', asset_id=asset.id) }}">Update</a>
+                            {% endif %}
+                            {# Delete link/form remains Admin only #}
+                            {% if current_user.is_admin %}
+                                 |
+                                 <form action="{{ url_for('assets.delete_asset', asset_id=asset.id) }}" method="POST" style="display:inline;">
+                                     {{ form.csrf_token }} {# Include CSRF token #}
+                                     <button type="submit" onclick="return confirm('Are you sure you want to delete asset: {{ asset.name }}?');" style="background:none; border:none; color:red; cursor:pointer; padding:0;">Delete</button>
+                                 </form>
+                            {% endif %}
+                        {% endif %}
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    {# --- Pagination Controls (using macro) --- #}
+    {# Call the macro, passing the pagination object, current sort params, and the endpoint name #}
+    {{ pagination_controls(pagination, sort_by, sort_direction, 'assets.list_assets') }}
+    {# --- End Pagination Controls --- #}
+
+
+{% endblock %}

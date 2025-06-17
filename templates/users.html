@@ -1,0 +1,96 @@
+{# templates/users.html #}
+{% extends "base.html" %}
+{# Import the macros file #}
+{% from "macros.html" import pagination_controls %}
+
+{% block title %}Users{% endblock %}
+{% block content %}
+    <h1>Users</h1>
+
+    {% if current_user.is_admin %}
+        <p><a href="{{ url_for('users.create_user') }}">Add New User</a></p>
+    {% endif %}
+
+    <table>
+        <thead>
+            <tr>
+                {# Make headers sortable links #}
+                <th>
+                    {% set next_direction = 'desc' if sort_by == 'username' and sort_direction == 'asc' else 'asc' %}
+                     {# Link includes current page, sort_by, and next_direction #}
+                    <a href="{{ url_for('users.list_users', page=pagination.page, sort_by='username', sort_direction=next_direction) }}">
+                        Username
+                        {% if sort_by == 'username' %}
+                            {% if sort_direction == 'asc' %} ▲ {% else %} ▼ {% endif %}
+                        {% endif %}
+                    </a>
+                </th>
+                 <th>
+                     {% set next_direction = 'desc' if sort_by == 'email' and sort_direction == 'asc' else 'asc' %}
+                      {# Link includes current page, sort_by, and next_direction #}
+                    <a href="{{ url_for('users.list_users', page=pagination.page, sort_by='email', sort_direction=next_direction) }}">
+                        Email
+                        {% if sort_by == 'email' %}
+                            {% if sort_direction == 'asc' %} ▲ {% else %} ▼ {% endif %}
+                        {% endif %}
+                    </a>
+                </th>
+                 <th>
+                     {% set next_direction = 'desc' if sort_by == 'role' and sort_direction == 'asc' else 'asc' %}
+                      {# Link includes current page, sort_by, and next_direction #}
+                    <a href="{{ url_for('users.list_users', page=pagination.page, sort_by='role', sort_direction=next_direction) }}">
+                        Role
+                        {% if sort_by == 'role' %}
+                            {% if sort_direction == 'asc' %} ▲ {% else %} ▼ {% endif %}
+                        {% endif %}
+                    </a>
+                </th>
+                {# Only show Actions column if user is admin #}
+                {% if current_user.is_admin %}
+                    <th>Actions</th>
+                {% endif %}
+            </tr>
+        </thead>
+        <tbody>
+            {# Loop over the items for the current page #}
+            {% for user in pagination.items %}
+                <tr>
+                    <td>
+                        {# Add link to the detail view (Admin only) #}
+                        {% if current_user.is_admin %}
+                            <a href="{{ url_for('users.view_user', user_id=user.id) }}">
+                               {{ user.username }}
+                            </a>
+                        {% else %}
+                            {# If not admin, just display the text #}
+                            {{ user.username }}
+                        {% endif %}
+                    </td>
+                    <td>{{ user.email }}</td>
+                    <td>{{ user.role }}</td>
+                    {# Only show Actions column if user is admin #}
+                    {% if current_user.is_admin %}
+                        <td>
+                            {# Update link (Admin only) #}
+                             <a href="{{ url_for('users.update_user', user_id=user.id) }}">Update</a>
+                             {# Admin only, with self-delete protection in template #}
+                             {% if current_user.id != user.id %}
+                                 |
+                                 <form action="{{ url_for('users.delete_user', user_id=user.id) }}" method="POST" style="display:inline;">
+                                     {{ form.csrf_token }} {# Include CSRF token #}
+                                     <button type="submit" onclick="return confirm('Are you sure you want to delete user: {{ user.username }}?');" style="background:none; border:none; color:red; cursor:pointer; padding:0;">Delete</button>
+                                 </form>
+                             {% endif %}
+                        </td>
+                    {% endif %}
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    {# --- Pagination Controls (using macro) --- #}
+    {# Call the macro, passing the pagination object, current sort params, and the endpoint name #}
+    {{ pagination_controls(pagination, sort_by, sort_direction, 'users.list_users') }}
+    {# --- End Pagination Controls --- #}
+
+{% endblock %}

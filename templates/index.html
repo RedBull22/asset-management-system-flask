@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}Home{% endblock %}
+{% block content %}
+    <h1>Welcome to the Asset Management System!</h1>
+    {% if current_user.is_authenticated %}
+        <p>Hello, {{ current_user.username }}! Your role is {{ current_user.role }}.</p>
+        <p>You can view <a href="{{ url_for('assets.list_assets') }}">Assets</a> and <a href="{{ url_for('assignments.list_assignments') }}">Assignments</a>.</p> {# Updated url_for #}
+        {% if current_user.is_admin %}
+             <p>As an Admin, you can also manage <a href="{{ url_for('asset_types.list_asset_types') }}">Asset Types</a> and <a href="{{ url_for('users.list_users') }}">Users</a>.</p> {# Updated url_for #}
+        {% endif %}
+    {% else %}
+        <p>Please <a href="{{ url_for('auth.login') }}">log in</a> or <a href="{{ url_for('auth.register') }}">register</a> to access the system.</p> {# Updated url_for #}
+    {% endif %}
+{% endblock %}

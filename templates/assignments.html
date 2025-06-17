@@ -1,0 +1,107 @@
+{# templates/assignments.html #}
+{% extends "base.html" %}
+{# Import the macros file #}
+{% from "macros.html" import pagination_controls %}
+
+{% block title %}Assignments{% endblock %}
+{% block content %}
+    <h1>Assignments</h1>
+
+    {# Allow Admin AND Regular users to create assignments #}
+    {% if current_user.is_admin or current_user.role == 'regular' %}
+        <p><a href="{{ url_for('assignments.create_assignment') }}">Create New Assignment</a></p>
+    {% endif %}
+
+     <table>
+        <thead>
+            <tr>
+                {# Make headers sortable links #}
+                {# Sorting by related object attributes (Asset.name, User.username) is more complex #}
+                {# Let's make Assignment Date, Asset ID, and User ID sortable for simplicity #}
+                <th>
+                     {% set next_direction = 'desc' if sort_by == 'date' and sort_direction == 'asc' else 'asc' %}
+                      {# Link includes current page, sort_by, and next_direction #}
+                    <a href="{{ url_for('assignments.list_assignments', page=pagination.page, sort_by='date', sort_direction=next_direction) }}">
+                        Assignment Date
+                        {% if sort_by == 'date' %}
+                            {% if sort_direction == 'asc' %} ▲ {% else %} ▼ {% endif %}
+                        {% endif %}
+                    </a>
+                </th>
+                <th>
+                     {% set next_direction = 'desc' if sort_by == 'asset_id' and sort_direction == 'asc' else 'asc' %}
+                      {# Link includes current page, sort_by, and next_direction #}
+                    <a href="{{ url_for('assignments.list_assignments', page=pagination.page, sort_by='asset_id', sort_direction=next_direction) }}">
+                        Asset ID
+                        {% if sort_by == 'asset_id' %}
+                            {% if sort_direction == 'asc' %} ▲ {% else %} ▼ {% endif %}
+                        {% endif %}
+                    </a>
+                </th>
+                 <th>
+                     {% set next_direction = 'desc' if sort_by == 'user_id' and sort_direction == 'asc' else 'asc' %}
+                      {# Link includes current page, sort_by, and next_direction #}
+                    <a href="{{ url_for('assignments.list_assignments', page=pagination.page, sort_by='user_id', sort_direction=next_direction) }}">
+                        User ID
+                        {% if sort_by == 'user_id' %}
+                            {% if sort_direction == 'asc' %} ▲ {% else %} ▼ {% endif %}
+                        {% endif %}
+                    </a>
+                </th>
+                {# Only show Actions column if user is admin #}
+                {% if current_user.is_admin or current_user.role == 'regular' %}
+                     <th>Actions</th>
+                {% endif %}
+            </tr>
+        </thead>
+        <tbody>
+            {# Loop over the items for the current page #}
+            {% for assignment in pagination.items %}
+                <tr>
+                    <td>{{ assignment.assignment_date.strftime('%Y-%m-%d %H:%M') }}</td>
+                    <td>
+                       {# Link to asset detail view #}
+                       <a href="{{ url_for('assets.view_asset', asset_id=assignment.asset.id) }}">
+                          {{ assignment.asset.name }} (ID: {{ assignment.asset.id }})
+                       </a>
+                    </td>
+                    <td>
+                       {# Link to user detail view (Admin only) #}
+                       {% if current_user.is_admin %}
+                           <a href="{{ url_for('users.view_user', user_id=assignment.user.id) }}">
+                              {{ assignment.user.username }} (ID: {{ assignment.user.id }})
+                           </a>
+                       {% else %}
+                           {{ assignment.user.username }} (ID: {{ assignment.user.id }})
+                       {% endif %}
+                    </td>
+
+                    {# Add Update/Delete links for the Assignment itself #}
+                    {% if current_user.is_authenticated %} {# Only show if logged in #}
+                         {% if current_user.is_admin or current_user.role == 'regular' %}
+                           <td>
+                                <a href="{{ url_for('assignments.update_assignment', assignment_id=assignment.id) }}">Update</a>
+                                {# Delete Form remains Admin only #}
+                                {% if current_user.is_admin %}
+                                     |
+                                     <form action="{{ url_for('assignments.delete_assignment', assignment_id=assignment.id) }}" method="POST" style="display:inline;">
+                                         {{ form.csrf_token }} {# Include CSRF token #}
+                                         <button type="submit" onclick="return confirm('Are you sure you want to delete this assignment?');" style="background:none; border:none; color:red; cursor:pointer; padding:0;">Delete</button>
+                                     </form>
+                                {% endif %}
+                           </td>
+                         {% endif %}
+                    {% endif %}
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+
+    {# --- Pagination Controls (using macro) --- #}
+    {# Call the macro, passing the pagination object, current sort params, and the endpoint name #}
+    {{ pagination_controls(pagination, sort_by, sort_direction, 'assignments.list_assignments') }}
+    {# --- End Pagination Controls --- #}
+
+
+{% endblock %}

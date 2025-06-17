@@ -1,0 +1,23 @@
+# Virtual environment
+venv/
+.venv/
+
+# SQLite database file
+*.db
+
+# Python bytecode
+__pycache__/
+*.pyc
+
+# Flask-specific files
+instance/
+
+# Environment variables file (if you use one locally like .env)
+.env
+
+# Log file
+*.log
+
+# Operating System Files
+.DS_Store # macOS
+Thumbs.db # Windows

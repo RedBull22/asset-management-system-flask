@@ -1,0 +1,214 @@
+/* Basic body styling */
+body {
+    font-family: sans-serif;
+    line-height: 1.6;
+    margin: 20px;
+    background-color: #f4f4f4;
+    color: #333;
+}
+
+/* Header and navigation styling */
+header {
+    background: #333;
+    color: #fff;
+    padding: 10px 0;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+nav a {
+    color: #fff;
+    text-decoration: none;
+    margin: 0 15px;
+    font-weight: bold;
+}
+
+nav a:hover {
+    text-decoration: underline;
+}
+
+/* Main content area */
+main {
+    max-width: 960px;
+    margin: auto;
+    background: #fff;
+    padding: 20px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+h1, h2 {
+    color: #333;
+}
+
+/* List styling */
+ul {
+    list-style: none;
+    padding: 0;
+}
+
+li {
+    background: #eee;
+    margin-bottom: 10px;
+    padding: 10px;
+    border-radius: 5px;
+}
+
+li a {
+    text-decoration: none;
+    color: #333;
+    font-weight: bold;
+}
+
+li a:hover {
+    text-decoration: underline;
+}
+
+
+/* Form styling */
+form div {
+    margin-bottom: 15px;
+}
+
+form label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+form input[type="text"],
+form input[type="email"],
+form input[type="password"],
+form select {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box; /* Include padding and border in element's total width and height */
+}
+
+form button[type="submit"],
+input[type="submit"] { /* Style for FlaskForm submit button */
+    background-color: #5cb85c;
+    color: white;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+form button[type="submit"]:hover,
+input[type="submit"]:hover {
+    background-color: #4cae4c;
+}
+
+
+/* Flash message styling */
+.flashes {
+    list-style: none;
+    padding: 0;
+    margin: 10px 0;
+}
+
+.flashes li {
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 4px;
+    font-weight: bold;
+}
+
+.flashes li.success {
+    background-color: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+.flashes li.danger {
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+.flashes li.info {
+    background-color: #d1ecf1;
+    color: #0c5460;
+    border: 1px solid #bee5eb;
+}
+
+.flashes li.warning {
+    background-color: #fff3cd;
+    color: #856404;
+    border: 1px solid #ffeeba;
+}
+
+/* Style for inline delete forms/buttons */
+li form {
+    display: inline;
+}
+
+li form button {
+     /* Inherit styles from li button if needed, or define specifically */
+     background: none;
+     border: none;
+     color: red; /* Make delete button red */
+     cursor: pointer;
+     padding: 0;
+     font-size: inherit; /* Match parent list item font size */
+}
+
+li form button:hover {
+    text-decoration: underline;
+}
+
+/* Style for standalone delete forms/buttons (e.g., on detail pages) */
+p form {
+    display: inline-block; /* Make forms in paragraphs not take full width */
+    margin-top: 10px; /* Add some space above delete form */
+}
+
+p form button {
+     background-color: #d9534f; /* Red button for delete */
+     color: white;
+     padding: 5px 10px;
+     border: none;
+     border-radius: 4px;
+     cursor: pointer;
+     font-size: 14px;
+}
+
+p form button:hover {
+    background-color: #c9302c;
+}
+
+/* Styling for Pagination Controls */
+.pagination {
+    margin-top: 20px;
+    text-align: center; /* Center the pagination links */
+}
+
+.pagination a,
+.pagination span {
+    display: inline-block; /* Make links/spans sit next to each other */
+    padding: 8px 12px; /* Add some padding */
+    margin: 0 4px; /* Add space between items */
+    border: 1px solid #ccc; /* Add a border */
+    text-decoration: none; /* Remove underline */
+    color: #333; /* Default text color */
+    border-radius: 4px; /* Slightly rounded corners */
+}
+
+.pagination a:hover {
+    background-color: #f0f0f0; /* Highlight on hover */
+}
+
+.pagination .current-page {
+    background-color: #007bff; /* Highlight the current page */
+    color: white;
+    border-color: #007bff;
+    font-weight: bold;
+}
+
+.pagination .disabled {
+    color: #ccc; /* Dim disabled links */
+    cursor: not-allowed; /* Change cursor for disabled items */
+}

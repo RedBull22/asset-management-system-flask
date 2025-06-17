@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block title %}{{ title }}{% endblock %} {# Use the title passed from the route #}
+{% block content %}
+    <h1>Asset Details: {{ asset.name }}</h1>
+
+    <p><strong>Serial Number:</strong> {{ asset.serial_number }}</p>
+    <p><strong>Asset Type:</strong> {{ asset.asset_type.name }}</p>
+
+    <h2>Assignments for this Asset</h2>
+    {% if asset.assignments %}
+        <ul>
+            {% for assignment in asset.assignments %}
+                <li>
+                    Assigned to User: {{ assignment.user.username }} ({{ assignment.user.email }})
+                    on {{ assignment.assignment_date.strftime('%Y-%m-%d %H:%M') }}
+                    {# Link to assignment detail view #}
+                     - <a href="{{ url_for('assignments.view_assignment', assignment_id=assignment.id) }}">View Assignment</a>
+                    {# Add Update/Delete links for the Assignment itself (Admin only) - These remain Admin only #}
+                    {% if current_user.is_admin %}
+                        - <a href="{{ url_for('assignments.update_assignment', assignment_id=assignment.id) }}">Update</a>
+                        -
+                        <form action="{{ url_for('assignments.delete_assignment', assignment_id=assignment.id) }}" method="POST" style="display:inline;">
+                           {{ form.csrf_token }} {# form is passed from the route #}
+                           <button type="submit" onclick="return confirm('Are you sure you want to delete this assignment?');" style="background:none; border:none; color:red; cursor:pointer; padding:0;">Delete</button>
+                        </form>
+                    {% endif %}
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>This asset is currently not assigned.</p>
+    {% endif %}
+
+    <p><a href="{{ url_for('assets.list_assets') }}">Back to Assets List</a></p>
+
+    {# Allow Admin AND Regular users to update assets #}
+    {% if current_user.is_admin or current_user.role == 'regular' %}
+         <p><a href="{{ url_for('assets.update_asset', asset_id=asset.id) }}">Update Asset</a></p>
+    {% endif %}
+    {# Delete link/form remains Admin only #}
+    {% if current_user.is_admin %}
+         <p>
+         <form action="{{ url_for('assets.delete_asset', asset_id=asset.id) }}" method="POST" style="display:inline;">
+             {{ form.csrf_token }} {# form is passed from the route #}
+             <button type="submit" onclick="return confirm('Are you sure you want to delete asset: {{ asset.name }}?');" style="background:none; border:none; color:red; cursor:pointer; padding:0;">Delete Asset</button>
+         </form>
+         </p>
+    {% endif %}
+
+{% endblock %}

@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block title %}{{ title }}{% endblock %}
+{% block content %}
+    <h1>{{ title }}: {{ asset_type.name }}</h1>
+    <form method="POST" action="{{ url_for('asset_types.update_asset_type', asset_type_id=asset_type.id) }}">
+        {{ form.csrf_token }}
+        <div>
+            {{ form.name.label }}<br>
+            {{ form.name() }}
+            {% for error in form.name.errors %}
+                <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}
+        </div>
+        <div>
+            {{ form.submit() }}
+        </div>
+    </form>
+    {# Updated Cancel link to go to the Asset Types list #}
+    <p><a href="{{ url_for('asset_types.list_asset_types') }}">Cancel</a></p>
+{% endblock %}

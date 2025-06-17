@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block title %}Asset Types{% endblock %}
+{% block content %}
+    <h1>Asset Types</h1>
+
+    {% if current_user.is_admin %}
+        <p><a href="{{ url_for('asset_types.create_asset_type') }}">Add New Asset Type</a></p> {# Updated #}
+    {% endif %}
+
+    <ul>
+        {% for asset_type in asset_types %}
+            <li>
+                {{ asset_type.name }}
+                {# Update/Delete links/forms (Admin only) #}
+                {% if current_user.is_admin %}
+                     - <a href="{{ url_for('asset_types.update_asset_type', asset_type_id=asset_type.id) }}">Update</a> {# Updated #}
+                     -
+                     <form action="{{ url_for('asset_types.delete_asset_type', asset_type_id=asset_type.id) }}" method="POST" style="display:inline;"> {# Updated #}
+                         {{ form.csrf_token }} {# Include CSRF token #}
+                         <button type="submit" onclick="return confirm('Are you sure you want to delete asset type: {{ asset_type.name }}?');" style="background:none; border:none; color:red; cursor:pointer; padding:0;">Delete</button>
+                     </form>
+                {% endif %}
+            </li>
+        {% endfor %}
+    </ul>
+{% endblock %}
