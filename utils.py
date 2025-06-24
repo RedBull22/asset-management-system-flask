@@ -8,14 +8,20 @@ such as the logic for handling pagination and sorting database queries.
 """
 
 from flask import request
-# Import db from extensions to access query object (though not directly used in the helper)
+# Import db from extensions to access query object and its functions (like db.func.lower)
+from extensions import db
+# Import String type from SQLAlchemy to check column types for case-insensitive sorting
+from sqlalchemy.types import String
+
 # Import models to reference model attributes for sorting
-from models import Asset, User, Assignment, AssetType # Import all models that might be queried/sorted
+# (These imports are already in your file, ensuring they are here for completeness)
+from models import Asset, User, Assignment, AssetType
 
 
 def paginate_and_sort_query(query, model, valid_sort_columns, default_sort_by, default_sort_direction, per_page=10):
     """
     Applies pagination and sorting logic to a SQLAlchemy query object.
+    Includes case-insensitive sorting for string columns.
 
     Args:
         query: The base SQLAlchemy query object (e.g., User.query).
@@ -41,18 +47,29 @@ def paginate_and_sort_query(query, model, valid_sort_columns, default_sort_by, d
     sort_direction = request.args.get('sort_direction', default_sort_direction)
 
     # Validate the sort_by parameter
+    # Ensure sort_by is a valid column
     if sort_by not in valid_sort_columns:
         sort_by = default_sort_by # Default to the specified default if invalid column
+    # Ensure sort_direction is valid
+    if sort_direction not in ['asc', 'desc']:
+        sort_direction = default_sort_direction # Default to 'asc' if invalid
 
     # Get the SQLAlchemy model attribute to sort by
     sort_column_attribute = valid_sort_columns[sort_by]
 
-    # Apply the sorting direction
-    if sort_direction == 'desc':
-        query = query.order_by(sort_column_attribute.desc())
-    else: # Default to ascending for 'asc' or any other value
-        query = query.order_by(sort_column_attribute.asc())
-        sort_direction = 'asc' # Ensure direction is 'asc' if not explicitly 'desc'
+    # Apply the sorting direction and handle case-insensitivity for string columns
+    if isinstance(sort_column_attribute.type, String):
+        # For string columns, use db.func.lower() for case-insensitive sorting
+        if sort_direction == 'desc':
+            query = query.order_by(db.func.lower(sort_column_attribute).desc())
+        else: # Default to ascending for 'asc' or any other value
+            query = query.order_by(db.func.lower(sort_column_attribute).asc())
+    else:
+        # For non-string columns (e.g., Integer, DateTime), sort directly
+        if sort_direction == 'desc':
+            query = query.order_by(sort_column_attribute.desc())
+        else: # Default to ascending
+            query = query.order_by(sort_column_attribute.asc())
 
     # --- End Sorting Logic ---
 
